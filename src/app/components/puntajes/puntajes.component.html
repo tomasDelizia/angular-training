@@ -1,0 +1,259 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <h1 class="text-white">Puntajes</h1>
+    <div class="d-flex">
+      <button (click)="onClickRegistrar()" type="button" class="btn btn-success btn-light" data-toggle="modal" data-target="#puntajeModal">
+        <i class="fa fa-plus"></i> Agregar
+      </button>
+    </div>
+  </div>
+</nav> <br>
+
+<nav class="navbar navbar-light bg-light justify-content-between">
+    <form [formGroup]="formFiltro" class="form-inline">
+      <label for="alumnoFiltro" class="mr-sm-2">Filtrar por alumno:</label>
+      <select class="form-select-sm mr-sm-2" name="alumnoFiltro" id="alumnoFiltro" formControlName="alumnoFiltro">
+        <option value="" selected hidden disabled>Seleccione un alumno</option>
+        <option
+                *ngFor="let alumno of alumnos"
+                [ngValue]="alumno.cuil">
+          {{alumno.nombre + ' ' + alumno.apellido}}
+        </option>
+      </select>
+      <button [disabled]="!formFiltro.valid" (click)="getPuntajesDeAlumno()" class="btn btn-outline-dark mr-sm-2" type="submit">
+        <i class="fa fa-search"></i> Buscar
+      </button>
+      <button type="button" class="btn btn-dark mr-sm-2" (click)="getPuntajes()">
+        <i class="fa fa-search"></i> Buscar Todos
+      </button>
+    </form>
+</nav>
+
+
+<section>
+  <table class="table mt-3">
+    <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Estudiante</th>
+      <th scope="col">Profesor</th>
+      <th scope="col">Tema</th>
+      <th scope="col">Interés</th>
+      <th scope="col">Complejidad</th>
+      <th scope="col">Entendimiento</th>
+      <th scope="col">Valoración</th>
+      <th scope="col">Observaciones</th>
+      <th scope="col">Acción</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr *ngFor="let puntaje of puntajes">
+      <th scope="row">{{ puntaje.idPuntaje }}</th>
+      <td>{{ puntaje.alumno }} </td>
+      <td>{{ puntaje.profesor }}</td>
+      <td>{{ puntaje.tema }}</td>
+      <td>{{ puntaje.interes }}</td>
+      <td>{{ puntaje.complejidad }}</td>
+      <td>{{ puntaje.entendimiento }}</td>
+      <td>{{ puntaje.valoracion }}</td>
+      <td>{{ puntaje.observaciones }}</td>
+      <td>
+        <button (click)="onClickModificar(puntaje)" class="btn btn-secondary mb-1" data-toggle="modal" data-target="#puntajeModal">
+          <i class="fa fa-edit"></i> Editar
+        </button>
+        <br>
+        <button (click)="onClickBorrar(puntaje)" class="btn btn-danger">
+          <i class="fa fa-trash"></i> Borrar
+        </button>
+      </td>
+    </tr>
+    </tbody>
+
+  </table>
+  <ngx-spinner></ngx-spinner>
+</section>
+
+<!-- Registrar puntaje -->
+<div class="modal fade" id="puntajeModal">
+  <div class="modal-dialog">
+    <div class="modal-content modal-lg">
+
+      <!-- Encabezado -->
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">Datos del Puntaje</h5>
+        <!-- Botón cerrar -->
+        <button class="close btn-close-white" data-dismiss="modal" #btnCerrar (click)="cerrarForm()">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <div class="modal-body">
+        <form [formGroup]="formPuntaje" (ngSubmit)="registrarPuntaje($event)">
+
+          <!-- Alumno -->
+          <div class="form-group">
+            <label for="alumno">Alumno</label>
+            <select class="form-select" name="alumno" id="alumno" formControlName="alumno">
+              <option value="" selected hidden disabled>Seleccione un alumno</option>
+              <option name = "alumno"
+                      *ngFor="let alumno of alumnos"
+                      [ngValue]="alumno.idAlumno">
+                {{alumno.nombre + ' ' + alumno.apellido}}
+              </option>
+            </select>
+
+            <div class="alert alert-danger" *ngIf="alumno.errors && alumno.touched">
+              <div *ngIf="alumno.hasError('required')">
+                El alumno es requerido
+              </div>
+            </div>
+          </div> <!-- end alumno -->
+
+          <!-- Profesor -->
+          <div class="form-group">
+            <label for="profesor">Profesor</label>
+            <select class="form-select" name="profesor" id="profesor" formControlName="profesor">
+              <option value="" selected hidden disabled>Seleccione un profesor</option>
+              <option name = "profesor"
+                      *ngFor="let profesor of profesores"
+                      [ngValue]="profesor.idProfesor">
+                {{profesor.nombre + ' ' + profesor.apellido}}
+              </option>
+            </select>
+
+            <div class="alert alert-danger" *ngIf="profesor.errors && profesor.touched">
+              <div *ngIf="profesor.hasError('required')">
+                El profesor es requerido
+              </div>
+            </div>
+          </div> <!-- end profesor -->
+
+          <!-- Tema -->
+          <div class="form-group">
+            <label for="tema">Tema</label>
+            <select class="form-select" name="tema" id="tema" formControlName="tema">
+              <option value="" selected hidden disabled>Seleccione un tema</option>
+              <option name = "tema"
+                      *ngFor="let tema of temas"
+                      [ngValue]="tema.idTema">
+                {{tema.nombre}}
+              </option>
+            </select>
+
+            <div class="alert alert-danger" *ngIf="tema.errors && tema.touched">
+              <div *ngIf="tema.hasError('required')">
+                El tema es requerido
+              </div>
+            </div>
+          </div> <!-- end tema -->
+
+          <!-- Interés -->
+          <div class="form-group">
+            <label for="interes">Interés</label>
+            <input class="form-control" type="number" name="interes" id="interes" formControlName="interes"
+            placeholder="Valore qué tan interesante le pareció el tema (entre 1 y 10)">
+
+            <div class="alert alert-danger" *ngIf="interes.errors && interes.touched">
+              <div *ngIf="interes.hasError('required')">
+                El interés es requerido
+              </div>
+              <div *ngIf="interes.hasError('min')">
+                El interés no puede ser menor a 1
+              </div>
+              <div *ngIf="interes.hasError('max')">
+                El interés no puede ser mayor a 10
+              </div>
+            </div>
+          </div> <!-- end interés -->
+
+          <!-- Complejidad -->
+          <div class="form-group">
+            <label for="complejidad">Complejidad</label>
+            <input class="form-control" type="number" name="complejidad" id="complejidad" formControlName="complejidad"
+                   placeholder="Valore qué tan complicado le pareció el tema (entre 1 y 10)">
+
+            <div class="alert alert-danger" *ngIf="complejidad.errors && complejidad.touched">
+              <div *ngIf="complejidad.hasError('required')">
+                La complejidad es requerida
+              </div>
+              <div *ngIf="complejidad.hasError('min')">
+                La complejidad no puede ser menor a 1
+              </div>
+              <div *ngIf="complejidad.hasError('max')">
+                La complejidad no puede ser mayor a 10
+              </div>
+            </div>
+          </div> <!-- end complejidad -->
+
+          <!-- Entendimiento -->
+          <div class="form-group">
+            <label for="entendimiento">Entendimiento</label>
+            <input class="form-control" type="number" name="entendimiento" id="entendimiento" formControlName="entendimiento"
+                   placeholder="Valore qué tanto comprendió el tema (entre 1 y 10)">
+
+            <div class="alert alert-danger" *ngIf="entendimiento.errors && entendimiento.touched">
+              <div *ngIf="entendimiento.hasError('required')">
+                El entendimiento es requerido
+              </div>
+              <div *ngIf="entendimiento.hasError('min')">
+                El entendimiento no puede ser menor a 1
+              </div>
+              <div *ngIf="entendimiento.hasError('max')">
+                El entendimiento no puede ser mayor a 10
+              </div>
+            </div>
+          </div> <!-- end entendimiento -->
+
+          <!-- Valoración -->
+          <div class="form-group">
+            <label for="valoracion">Valoración</label>
+            <input class="form-control" type="number" name="valoracion" id="valoracion" formControlName="valoracion"
+                   placeholder="Valore al profesor (entre 1 y 10)">
+
+            <div class="alert alert-danger" *ngIf="valoracion.errors && valoracion.touched">
+              <div *ngIf="valoracion.hasError('required')">
+                La valoración es requerida
+              </div>
+              <div *ngIf="valoracion.hasError('min')">
+                La valoración no puede ser menor a 1
+              </div>
+              <div *ngIf="valoracion.hasError('max')">
+                La valoración no puede ser mayor a 10
+              </div>
+            </div>
+          </div> <!-- end valoracion -->
+
+          <!-- Observaciones -->
+          <div class="form-group">
+            <label for="observaciones">Observaciones</label>
+            <textarea class="form-control" name="observaciones" id="observaciones" formControlName="observaciones"
+            placeholder="Ingrese sus observaciones">
+            </textarea>
+            <div *ngIf="observaciones.dirty">
+              {{observaciones.value.length}}/500
+            </div>
+
+            <div class="alert alert-danger" *ngIf="observaciones.errors && observaciones.touched">
+              <div *ngIf="observaciones.hasError('maxlength')">
+                Las observaciones no pueden pasar los 500 caracteres
+              </div>
+            </div>
+          </div> <!-- end observaciones -->
+
+        </form>
+      </div>
+
+      <!-- Pie -->
+      <div class="modal-footer">
+        <button type="button" (click)="cerrarForm()" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button *ngIf="mostrarModificar"
+                type="submit" (click)="modificarPuntaje($event)" class="btn btn-dark">Modificar</button>
+        <button *ngIf="mostrarRegistrar"
+          type="submit" (click)="registrarPuntaje($event)" class="btn btn-dark">Registrar</button>
+      </div>
+
+    </div>
+  </div>
+</div> <!-- end registrar puntaje -->

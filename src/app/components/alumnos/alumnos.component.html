@@ -1,0 +1,169 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <h1 class="text-white">Alumnos</h1>
+    <div class="d-flex flex-row">
+      <button (click)="onClickRegistrar()" type="button" class="btn btn-success btn-light m-2" data-toggle="modal" data-target="#alumnoModal">
+        <i class="fa fa-plus"></i> Agregar
+      </button>
+      <button (click)="buscarAlumnos()" type="button" class="btn btn-success btn-light m-2">
+        <i class="fa fa-search"></i> Buscar Todos
+      </button>
+    </div>
+  </div>
+</nav> <br>
+
+<section>
+  <table class="table mt-3">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Apellido</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Cuil</th>
+        <th scope="col">Repartición</th>
+        <th scope="col">Acción</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let alumno of alumnos">
+        <th scope="row">{{ alumno.idAlumno }}</th>
+        <td>{{ alumno.apellido }} </td>
+        <td>{{ alumno.nombre }}</td>
+        <td>{{ alumno.cuil }}</td>
+        <td>{{ alumno.reparticion }}</td>
+        <td>
+          <button (click)="onClickModificar(alumno)" class="btn btn-secondary mb-1" data-toggle="modal" data-target="#alumnoModal">
+            <i class="fa fa-edit"></i> Editar
+          </button>
+          <br>
+          <button (click)="onClickBorrar(alumno)" class="btn btn-danger">
+            <i class="fa fa-trash"></i> Borrar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+  <ngx-spinner></ngx-spinner>
+</section>
+
+<!-- Registrar alumno -->
+<div class="modal fade" id="alumnoModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content modal-lg">
+
+      <!-- Encabezado -->
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">Datos del Alumno</h5>
+        <!-- Botón cerrar -->
+        <button class="close btn-close-white" data-dismiss="modal" #btnCerrar (click)="cerrarForm()">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <div class="modal-body">
+        <form [formGroup]="formAlumno" (ngSubmit)="registrarAlumno($event)">
+
+          <!-- Apellido -->
+          <div class="form-group">
+            <label for="apellido">Apellido</label>
+            <input type="text" name="apellido" class="form-control" id="apellido" formControlName="apellido"
+                   placeholder="Ingrese el apellido">
+
+            <div class="alert alert-danger" *ngIf="apellido.errors && apellido.touched">
+              <div *ngIf="apellido.hasError('required')">
+                El apellido es requerido
+              </div>
+              <div *ngIf="apellido.hasError('maxlength')">
+                El apellido no puede tener más de 45 caracteres
+              </div>
+            </div>
+          </div> <!-- end apellido -->
+
+          <!-- Nombre -->
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" class="form-control" id="nombre" formControlName="nombre"
+                   placeholder="Ingrese el nombre">
+
+            <div class="alert alert-danger" *ngIf="nombre.errors && nombre.touched">
+              <div *ngIf="nombre.hasError('required')">
+                El nombre es requerido
+              </div>
+              <div *ngIf="nombre.hasError('maxlength')">
+                El nombre no puede tener más de 45 caracteres
+              </div>
+            </div>
+          </div> <!-- end nombre -->
+
+          <!-- Cuil -->
+          <div class="form-group">
+            <label for="cuil">Cuil</label>
+            <input type="text" name="cuil" class="form-control" id="cuil" formControlName="cuil"
+                   placeholder="Ingrese el cuil">
+
+            <div class="alert alert-danger" *ngIf="cuil.errors && cuil.touched">
+              <div *ngIf="cuil.hasError('required')">
+                El cuil es requerido
+              </div>
+              <div *ngIf="cuil.hasError('minlength')">
+                El cuil no puede tener menos de 11 caracteres
+              </div>
+              <div *ngIf="cuil.hasError('maxlength')">
+                El cuil no puede tener más de 45 caracteres
+              </div>
+            </div>
+          </div> <!-- end cuil -->
+
+          <!-- Edad -->
+          <div class="form-group">
+            <label for="edad">Edad</label>
+            <input type="number" name="edad" class="form-control" id="edad" formControlName="edad"
+                   placeholder="Ingrese la edad">
+
+            <div class="alert alert-danger" *ngIf="edad.errors && edad.touched">
+              <div *ngIf="edad.hasError('required')">
+                La edad es requerida
+              </div>
+              <div *ngIf="edad.hasError('min') || edad.hasError('max')">
+                Ingrese una edad válida
+              </div>
+            </div>
+          </div> <!-- end edad -->
+
+          <!-- Repartición -->
+          <div class="form-group">
+            <label for="reparticion">Repartición</label>
+            <select class="form-select" name="reparticion" id="reparticion" formControlName="reparticion">
+              <option value="" selected disabled hidden>Seleccione una repartición</option>
+              <option name = "reparticion"
+                      *ngFor="let reparticion of reparticiones"
+                      [ngValue]="reparticion.nombre">
+                {{reparticion.nombre}}
+              </option>
+            </select>
+
+            <div class="alert alert-danger" *ngIf="reparticion.errors && reparticion.touched">
+              <div *ngIf="reparticion.hasError('required')">
+                La repartición es requerida
+              </div>
+            </div>
+          </div> <!-- end reparticion -->
+
+        </form>
+      </div>
+
+      <!-- Pie -->
+      <div class="modal-footer">
+        <button type="button" (click)="cerrarForm()" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button *ngIf="mostrarModificar"
+                type="submit" (click)="modificarAlumno($event)" class="btn btn-dark ">Modificar</button>
+        <button *ngIf="mostrarRegistrar"
+                type="submit" (click)="registrarAlumno($event)" class="btn btn-dark">Registrar</button>
+      </div>
+
+    </div>
+  </div>
+</div> <!-- end registrar alumno -->
